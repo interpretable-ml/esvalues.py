@@ -1,3 +1,11 @@
+import queue
+import numpy as np
+import itertools
+import copy
+import scipy.special
+import scipy.stats
+import math
+
 from .iterators import ESKernelSubsets
 
 def varying_groups(x, X, featureGroups):

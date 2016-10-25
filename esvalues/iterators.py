@@ -1,3 +1,10 @@
+import queue
+import numpy as np
+import itertools
+import copy
+import scipy.special
+import scipy.stats
+import math
 
 class OrderedSubsets:
     def __init__(self, members, f, order="decending"):
