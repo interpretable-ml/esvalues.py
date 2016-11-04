@@ -1,4 +1,3 @@
-import queue
 import numpy as np
 import itertools
 import copy
@@ -72,9 +71,9 @@ class ESValuesEstimator:
         elif self.M == 1:
             fx = np.mean(self.f(x))
             fnull = np.mean(self.f(self.X))
-            φ = np.zeros(len(self.featureGroups))
-            φ[self.varyingInds[0]] = self.link(self.fx) - self.link(self.fnull)
-            return self.fnull,φ,np.zeros(len(self.featureGroups))
+            phi = np.zeros(len(self.featureGroups))
+            phi[self.varyingInds[0]] = self.link(self.fx) - self.link(self.fnull)
+            return self.fnull,phi,np.zeros(len(self.featureGroups))
 
         # pick a reasonable number of samples if the user didn't specify how many they wanted
         if self.nsamples == 0:
@@ -114,14 +113,14 @@ class ESValuesEstimator:
 
 
         # solve then expand the ES values vector to contain the non-varying features as well
-        vφ,vφVar = self.solve()
-        φ = np.zeros(len(self.featureGroups))
-        φ[self.varyingInds] = vφ
-        φVar = np.zeros(len(self.featureGroups))
-        φVar[self.varyingInds] = vφVar
+        vphi,vphiVar = self.solve()
+        phi = np.zeros(len(self.featureGroups))
+        phi[self.varyingInds] = vphi
+        phiVar = np.zeros(len(self.featureGroups))
+        phiVar[self.varyingInds] = vphiVar
 
         # return the Shapley values along with variances of the estimates
-        return self.fnull,φ,φVar
+        return self.fnull,phi,phiVar
 
     def addsample(self, x, m, w):
         offset = self.nsamplesAdded * self.N
@@ -155,21 +154,21 @@ class ESValuesEstimator:
         # adjust the y value according to the constraints for the offset and sum
         eyAdj = self.linkv(self.ey) - self.lastMask*(self.link(self.fx) - self.link(self.fnull)) - self.link(self.fnull)
 
-        # solve a weighted least squares equation to estimate φ
+        # solve a weighted least squares equation to estimate phi
         tmp = np.transpose(np.transpose(self.maskMatrix) * np.transpose(self.kernelWeights))
         tmp2 = np.linalg.inv(np.dot(np.transpose(tmp),self.maskMatrix))
         w = np.dot(tmp2,np.dot(np.transpose(tmp),eyAdj))
         wlast = (self.link(self.fx) - self.link(self.fnull)) - sum(w)
-        φ = np.hstack((w, wlast))
+        phi = np.hstack((w, wlast))
 
         yHat = np.dot(self.maskMatrix, w)
-        φVar = np.var(yHat - eyAdj) * np.diag(tmp2)
-        φVar = np.hstack((φVar, max(φVar))) # since the last weight is inferred we use a pessimistic guess of its variance
+        phiVar = np.var(yHat - eyAdj) * np.diag(tmp2)
+        phiVar = np.hstack((phiVar, max(phiVar))) # since the last weight is inferred we use a pessimistic guess of its variance
 
         # a finite sample adjustment based on how much of the weight is left in the sample space
         fractionWeightLeft = 1 - sum(self.kernelWeights)/sum(np.array([(self.M-1)/(s*(self.M-s)) for s in range(1, self.M)]))
 
-        return φ,φVar*fractionWeightLeft
+        return phi,phiVar*fractionWeightLeft
 
 def esvalues(x, f, X, link=lambda x: x, **kwargs):
     return ESValuesEstimator(f, X, link, **kwargs).esvalues(x)

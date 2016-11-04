@@ -1,4 +1,7 @@
-import queue
+try:
+    from queue import PriorityQueue
+except ImportError:
+    from Queue import PriorityQueue
 import numpy as np
 import itertools
 import copy
@@ -19,7 +22,7 @@ class OrderedSubsets:
         #print("self.vf(members)",orderBy(members))
         #print("np.argsort(orderBy(members))", np.argsort(orderBy(members)), type(np.argsort(orderBy(members))))
         self.members = members[np.argsort(orderBy(members))]
-        self.pq = queue.PriorityQueue()
+        self.pq = PriorityQueue()
         self.started = False
         self.numSeen = 0
 

@@ -91,13 +91,13 @@ class TestESValues(unittest.TestCase):
         X = np.zeros((1, P))
         x = np.ones((1, P)) #np.random.randn(1, P)
         f = lambda x: np.sum(x, 1)
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
         self.assertTrue(fnull == 0)
-        #print(φ, x, φVar)
-        self.assertTrue(np.linalg.norm(φ - x) < 1e-5)
-        self.assertTrue(np.linalg.norm(φVar) < 1e-5)
-        self.assertTrue(φ.size == P)
-        self.assertTrue(φVar.size == P)
+        #print(phi, x, phiVar)
+        self.assertTrue(np.linalg.norm(phi - x) < 1e-5)
+        self.assertTrue(np.linalg.norm(phiVar) < 1e-5)
+        self.assertTrue(phi.size == P)
+        self.assertTrue(phiVar.size == P)
 
     def test_minimal_rand(self):
         # basic test rand
@@ -106,12 +106,12 @@ class TestESValues(unittest.TestCase):
         X = np.zeros((1, P))
         x = np.random.randn(1, P)
         f = lambda x: np.sum(x, 1)
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
         self.assertTrue(fnull == 0)
-        self.assertTrue(np.linalg.norm(φ - x) < 1e-5)
-        self.assertTrue(np.linalg.norm(φVar) < 1e-5)
-        self.assertTrue(φ.size == P)
-        self.assertTrue(φVar.size == P)
+        self.assertTrue(np.linalg.norm(phi - x) < 1e-5)
+        self.assertTrue(np.linalg.norm(phiVar) < 1e-5)
+        self.assertTrue(phi.size == P)
+        self.assertTrue(phiVar.size == P)
 
     def test_group_no_vary(self):
         P = 5
@@ -120,8 +120,8 @@ class TestESValues(unittest.TestCase):
         x = np.ones((1, P))
         f = lambda x: np.sum(x, 1)
         groups = [np.array([0,1]),np.array([2]),np.array([3]),np.array([4])]
-        fnull,φg,φVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
-        self.assertTrue(φg.size == 4)
+        fnull,phig,phiVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
+        self.assertTrue(phig.size == 4)
 
     def test_group(self):
         P = 5
@@ -131,8 +131,8 @@ class TestESValues(unittest.TestCase):
         x[0,0] = 0
         f = lambda x: np.sum(x, 1)
         groups = [np.array([0,1]),np.array([2]),np.array([3]),np.array([4])]
-        fnull,φg,φVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
-        self.assertTrue(φg.size == 4)
+        fnull,phig,phiVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
+        self.assertTrue(phig.size == 4)
 
     def test_many_features(self):
         # check computation with many features
@@ -140,8 +140,8 @@ class TestESValues(unittest.TestCase):
         X = np.zeros((4, P))
         x = np.ones((1, P))
         f = lambda x: np.sum(x, 1)
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=400)
-        self.assertTrue(φ.size == 200)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=400)
+        self.assertTrue(phi.size == 200)
 
     def test_the_rest(self):
         # make sure things work when only two features vary
@@ -150,41 +150,41 @@ class TestESValues(unittest.TestCase):
         x[0:2,0] = 0
         X = np.ones((1, P))
         f = lambda x: np.sum(x, 1)
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=8000)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=8000)
         self.assertTrue(fnull == 5)
-        self.assertTrue(np.linalg.norm(X + φ - x) < 1e-5)
-        self.assertTrue(np.linalg.norm(φVar) < 1e-5)
+        self.assertTrue(np.linalg.norm(X + phi - x) < 1e-5)
+        self.assertTrue(np.linalg.norm(phiVar) < 1e-5)
 
         # X and x are identical
         np.random.seed(1)
         X = np.random.randn(1, P)
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
         self.assertTrue(np.abs(fnull - np.sum(X,1)[0]) < 1e-5)
-        self.assertTrue(np.linalg.norm(X + φ - x) < 1e-5)
-        self.assertTrue(np.linalg.norm(φVar) < 1e-5)
+        self.assertTrue(np.linalg.norm(X + phi - x) < 1e-5)
+        self.assertTrue(np.linalg.norm(phiVar) < 1e-5)
 
         # X and x are identical
         np.random.seed(1)
         x = np.zeros((1, P))
         x[0,0] = 1
         X = np.zeros((1, P))
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=8)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=8)
         self.assertTrue(fnull == np.sum(X))
-        self.assertTrue(np.linalg.norm(X + φ - x) < 1e-5)
-        self.assertTrue(np.linalg.norm(φVar) < 1e-5)
+        self.assertTrue(np.linalg.norm(X + phi - x) < 1e-5)
+        self.assertTrue(np.linalg.norm(phiVar) < 1e-5)
 
         # non-zero reference distribution
         X = np.ones((1,P))
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=8000)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=8000)
         self.assertTrue(fnull == 5)
-        self.assertTrue(np.linalg.norm(X + φ - x) < 1e-5)
-        self.assertTrue(np.linalg.norm(φVar) < 1e-5)
+        self.assertTrue(np.linalg.norm(X + phi - x) < 1e-5)
+        self.assertTrue(np.linalg.norm(phiVar) < 1e-5)
 
         X = np.random.randn(1, P)
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
         self.assertTrue(fnull == f(X)[0])
-        self.assertTrue(np.linalg.norm(X + φ - x) < 1e-5)
-        self.assertTrue(np.linalg.norm(φVar) < 1e-5)
+        self.assertTrue(np.linalg.norm(X + phi - x) < 1e-5)
+        self.assertTrue(np.linalg.norm(phiVar) < 1e-5)
 
         def powerset(iterable):
             "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
@@ -230,37 +230,37 @@ class TestESValues(unittest.TestCase):
         X = np.random.randn(4, P)
         f = lambda x: np.sum(x, 1)
         groups = [np.array([0,1]),np.array([2]),np.array([3]),np.array([4])]
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
-        fnull,φg,φVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
-        self.assertTrue(abs(φ[0] + φ[1] - φg[0]) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
+        fnull,phig,phiVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
+        self.assertTrue(abs(phi[0] + phi[1] - phig[0]) < 1e-5)
 
         # check computation of groups when nothing varies
         X = np.ones((4, P))
         x = np.ones((1, P))
         f = lambda x: np.sum(x, 1)
         groups = [np.array([0,1]),np.array([2]),np.array([3]),np.array([4])]
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
-        fnull,φg,φVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
-        self.assertTrue(abs(φ[0] + φ[1] - φg[0]) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
+        fnull,phig,phiVar = esvalues(x, f, X, featureGroups=groups, nsamples=8)
+        self.assertTrue(abs(phi[0] + phi[1] - phig[0]) < 1e-5)
 
         # check against brute force computation
         X = np.random.randn(4, P)
         f = lambda x: np.sum(x, 1)
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
-        for i in range(0, len(φ)):
-            self.assertTrue(abs(φ[i] - rawShapley(x, f, X, i)) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
+        for i in range(0, len(phi)):
+            self.assertTrue(abs(phi[i] - rawShapley(x, f, X, i)) < 1e-5)
 
         # non-linear function
         f = lambda x: np.sum(x, 1)**2
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
-        for i in range(0, len(φ)):
-            self.assertTrue(abs(φ[i] - rawShapley(x, f, X, i)) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
+        for i in range(0, len(phi)):
+            self.assertTrue(abs(phi[i] - rawShapley(x, f, X, i)) < 1e-5)
 
         # non-linear function that interestingly is still possible to estimate with only 2P samples
         f = lambda x: np.sum(x**2, 1)**2
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10)
-        for i in range(0, len(φ)):
-            self.assertTrue(abs(φ[i] - rawShapley(x, f, X, i)) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10)
+        for i in range(0, len(phi)):
+            self.assertTrue(abs(phi[i] - rawShapley(x, f, X, i)) < 1e-5)
 
         def logistic(x):
             return 1/(1+np.exp(-x))
@@ -269,17 +269,17 @@ class TestESValues(unittest.TestCase):
 
         # non-linear logistic function
         f = lambda x: logistic(np.sum(x, 1))
-        fnull,φ,φVar = esvalues(x, f, X, nsamples=10000)
-        for i in range(0, len(φ)):
-            self.assertTrue(abs(φ[i] - rawShapley(x, f, X, i)) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, nsamples=10000)
+        for i in range(0, len(phi)):
+            self.assertTrue(abs(phi[i] - rawShapley(x, f, X, i)) < 1e-5)
 
         # non-linear logistic function with groups
         f = lambda x: logistic(np.sum(x, 1))
         groups = [np.array([0,1]),np.array([2]),np.array([3]),np.array([4])]
-        fnull,φ,φVar = esvalues(x, f, X, featureGroups=groups, nsamples=10000)
-        φRaw = [rawShapley(x, f, X, i, featureGroups=groups) for i in range(0, len(φ))]
-        for i in range(0, len(φ)):
-            self.assertTrue(abs(φ[i] - φRaw[i]) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, featureGroups=groups, nsamples=10000)
+        phiRaw = [rawShapley(x, f, X, i, featureGroups=groups) for i in range(0, len(phi))]
+        for i in range(0, len(phi)):
+            self.assertTrue(abs(phi[i] - phiRaw[i]) < 1e-5)
 
         # test many totally arbitrary functions
         def gen_model(M):
@@ -296,29 +296,29 @@ class TestESValues(unittest.TestCase):
         for i in range(10):
             model = gen_model(P)
             f = lambda x: np.array([model[tuple(np.nonzero(x[j,:].flatten())[0])] for j in range(x.shape[0])])
-            fnull,φ,φVar = esvalues(x, f, X, nsamples=1000000)
+            fnull,phi,phiVar = esvalues(x, f, X, nsamples=1000000)
             phiRaw = np.array([rawShapley(x, f, X, j) for j in range(P)])
-            self.assertTrue(np.linalg.norm(φ - np.array([rawShapley(x, f, X, j) for j in range(P)])) < 1e-6)
+            self.assertTrue(np.linalg.norm(phi - np.array([rawShapley(x, f, X, j) for j in range(P)])) < 1e-6)
 
         # non-linear logistic function with logit link
         X = np.random.randn(1,P)
         x = np.random.randn(1,P)
         f = lambda x: logistic(np.sum(x, 1))
-        fnull,φ,φVar = esvalues(x, f, X, logit, nsamples=1000000)
-        for i in range(φ.size):
+        fnull,phi,phiVar = esvalues(x, f, X, logit, nsamples=1000000)
+        for i in range(phi.size):
             sv = rawShapley(x, f, X, i, logit)
-            self.assertTrue(abs(φ[i] - rawShapley(x, f, X, i, logit)) < 1e-5)
+            self.assertTrue(abs(phi[i] - rawShapley(x, f, X, i, logit)) < 1e-5)
 
-        self.assertTrue(sum(abs(φVar)) < 1e-12) # we have exhausted the sample space so there should be no uncertainty
+        self.assertTrue(sum(abs(phiVar)) < 1e-12) # we have exhausted the sample space so there should be no uncertainty
 
         # non-linear logistic function with logit link and random background
         P = 2
         X = np.random.randn(10,P)
         x = np.random.randn(1,P)
         f = lambda x: logistic(np.sum(x, 1))
-        fnull,φ,φVar = esvalues(x, f, X, logit, nsamples=1000000)
-        φRaw = np.array([rawShapley(x, f, X, i, logit) for i in range(φ.size)])
-        self.assertTrue(np.linalg.norm(φ - φRaw) < 1e-5)
+        fnull,phi,phiVar = esvalues(x, f, X, logit, nsamples=1000000)
+        phiRaw = np.array([rawShapley(x, f, X, i, logit) for i in range(phi.size)])
+        self.assertTrue(np.linalg.norm(phi - phiRaw) < 1e-5)
 
         # test many totally arbitrary functions with logit link
         P = 10
@@ -327,9 +327,9 @@ class TestESValues(unittest.TestCase):
         for i in range(10):
             model = gen_model(P)
             f = lambda x: np.array([logistic(model[tuple(np.nonzero(x[j,:].flatten())[0])]) for j in range(x.shape[0])])
-            fnull,φ,φVar = esvalues(x, f, X, logit, nsamples=1000000)
+            fnull,phi,phiVar = esvalues(x, f, X, logit, nsamples=1000000)
             phiRaw = np.array([rawShapley(x, f, X, j, logit) for j in range(P)])
-            self.assertTrue(np.linalg.norm(φ - phiRaw) < 1e-6)
+            self.assertTrue(np.linalg.norm(phi - phiRaw) < 1e-6)
 
         # test arbitrary functions with logit link and feature groups
         P = 10
@@ -339,7 +339,7 @@ class TestESValues(unittest.TestCase):
         for i in range(3):
             model = gen_model(P)
             f = lambda x: np.array([logistic(model[tuple(np.nonzero(x[j,:].flatten())[0])]) for j in range(x.shape[0])])
-            fnull,φ,φVar = esvalues(x, f, X, logit, nsamples=1000000, featureGroups=groups)
+            fnull,phi,phiVar = esvalues(x, f, X, logit, nsamples=1000000, featureGroups=groups)
             phiRaw = np.array([rawShapley(x, f, X, j, logit, featureGroups=groups) for j in range(len(groups))])
-            self.assertTrue(np.linalg.norm(φ - phiRaw) < 1e-6)
-            self.assertTrue(abs(logistic(logit(fnull)+np.sum(φ)) - f(x)[0]) < 1e-6)
+            self.assertTrue(np.linalg.norm(phi - phiRaw) < 1e-6)
+            self.assertTrue(abs(logistic(logit(fnull)+np.sum(phi)) - f(x)[0]) < 1e-6)
